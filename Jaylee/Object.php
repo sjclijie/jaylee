@@ -36,7 +36,7 @@ class Object {
 
         if (method_exists($this, $setter)){
 
-            $this->$setter = $value;
+            $this->$setter($value);
 
         }else if (method_exists($this, $getter)){
 
@@ -45,6 +45,35 @@ class Object {
         }else {
 
             throw new \Exception("Setting unknown property: " . get_class($this) . "::" . $name);
+        }
+    }
+
+    public function __isset($name){
+
+        $getter = "get" . $name;
+
+        if (method_exists($this, $getter)){
+
+            return $this->$getter() !== null;
+
+        }else {
+
+            return false;
+        }
+    }
+
+    public function __unset($name){
+
+        $setter = "set" . $name;
+        $getter = "get" . $name;
+
+        if (method_exists($this, $setter)){
+
+            $this->$setter(null);
+
+        }else if(method_exists($this, $getter)){
+
+            throw new \Exception('Unsetting read-only property: ' . get_class($this) . '::' . $name);
         }
     }
 }
